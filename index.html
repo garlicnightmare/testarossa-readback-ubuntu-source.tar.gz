@@ -1,0 +1,3343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#100b12">
+<title>Testarossa | Imperial Arcane</title>
+<style>
+:root {
+  color-scheme:dark;
+  --bg:#100b12; --panel:#19121c; --panel2:#211722;
+  --red:#b83250; --rose:#e16b85; --gold:#c9a777;
+  --text:#f6edf1; --muted:#ad9ba9; --line:#49303f;
+}
+* {box-sizing:border-box}
+body {
+  margin:0; min-height:100vh; padding:20px;
+  color:var(--text); font:14px "Segoe UI",Arial,sans-serif;
+  background:
+    radial-gradient(ellipse at 12% 20%,#68243b44,transparent 38%),
+    radial-gradient(ellipse at 90% 90%,#40203e55,transparent 42%),
+    var(--bg);
+}
+.shell {
+  width:min(1500px,100%); min-height:calc(100vh - 40px);
+  margin:auto; display:grid;
+  grid-template-columns:360px minmax(360px,1fr) 230px;
+  gap:14px;
+}
+.panel {
+  background:linear-gradient(155deg,#211722f5,#151019);
+  border:1px solid var(--line); border-radius:19px;
+  box-shadow:0 20px 65px #0007; overflow:hidden;
+}
+.character {display:flex; flex-direction:column; min-height:760px}
+.brand {padding:20px 20px 13px; border-bottom:1px solid var(--line)}
+.eyebrow {
+  color:var(--gold); text-transform:uppercase;
+  letter-spacing:3px; font-size:10px; font-weight:700
+}
+.brand h1 {font:30px Georgia,serif; margin:7px 0 3px; font-weight:400}
+.sub {font-size:12px;color:var(--muted)}
+.portrait-wrap {
+  flex:1; min-height:400px; display:flex;
+  align-items:center; justify-content:center;
+  padding:8px 8px 0;
+  background:radial-gradient(ellipse at 50% 42%,#a43c5b26,transparent 67%);
+}
+.portrait {
+  display:block; width:100%; max-width:350px;
+  filter:drop-shadow(0 18px 28px #0009);
+  overflow:visible;
+}
+.hair-sway {transform-origin:250px 190px; animation:sway 7s ease-in-out infinite}
+.hair-sway-left {transform-origin:150px 210px; animation:swayleft 8s ease-in-out infinite}
+.breath {transform-origin:250px 510px; animation:breath 5s ease-in-out infinite}
+@keyframes sway {0%,100%{transform:rotate(0)}50%{transform:rotate(1deg)}}
+@keyframes swayleft {0%,100%{transform:rotate(0)}50%{transform:rotate(-1deg)}}
+@keyframes breath {0%,100%{transform:translateY(0)}50%{transform:translateY(2px)}}
+.eye-blink {transform-origin:center; animation:blink 6s infinite}
+@keyframes blink {0%,46%,49%,100%{transform:scaleY(1)}47%,48%{transform:scaleY(.08)}}
+.portrait[data-expression="happy"] .mouth {d:path("M218 369 Q250 389 282 369")}
+.portrait[data-expression="thinking"] .brow-left {transform:translateY(-3px)}
+.portrait[data-expression="curious"] .head {transform:rotate(-2deg);transform-origin:250px 300px}
+.character-caption {text-align:center;padding:8px 15px 17px}
+.character-caption h2 {font:italic 25px Georgia,serif;margin:0 0 6px}
+.character-caption p {font-size:11px;color:var(--muted);line-height:1.5;margin:0}
+.presence {
+  margin:0 17px 17px; padding:12px;
+  border:1px solid var(--line); border-radius:12px;
+  text-align:center; background:#100b1299
+}
+.presence strong {color:var(--rose);font-size:12px}
+.presence div {font-size:11px;color:var(--muted);margin-top:5px}
+.chat-panel {display:flex;flex-direction:column;min-height:760px}
+.chat-head {
+  padding:19px 21px; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between; gap:12px
+}
+.chat-head h2 {font:21px Georgia,serif;margin:0}
+.connection {font-size:11px;color:var(--muted);margin-top:5px}
+.dot {display:inline-block;width:7px;height:7px;border-radius:50%;background:#d6a45c;margin-right:7px}
+.modes {display:flex;gap:6px}
+.mode {
+  border:1px solid var(--line); border-radius:20px;
+  padding:8px 11px; color:var(--muted); background:#17111a;font-size:11px
+}
+.mode.active {color:#ffeaf0;border-color:var(--red);background:#68243b66}
+#chat {flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:13px}
+.message {
+  max-width:85%;padding:13px 16px;border:1px solid #493342;
+  border-radius:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere
+}
+.baby {align-self:flex-start;background:#2b202d}
+.user {align-self:flex-end;background:#542637;border-color:#814052}
+.composer {padding:16px;border-top:1px solid var(--line)}
+form {display:flex;gap:10px}
+textarea {
+  flex:1;resize:vertical;min-height:50px;max-height:130px;
+  padding:14px;border-radius:12px;border:1px solid var(--line);
+  background:#100b12;color:var(--text);outline:none;font:inherit
+}
+textarea:focus {border-color:var(--rose)}
+.send {
+  border:0;border-radius:12px;padding:0 21px;
+  color:white;font-weight:700;background:linear-gradient(135deg,#a52d4d,#df607c)
+}
+.send:disabled {opacity:.5;cursor:wait}
+.hint {color:var(--muted);font-size:10px;margin:10px 2px 0}
+.details {padding:20px 16px;display:flex;flex-direction:column;gap:18px}
+.details h3 {font:17px Georgia,serif;color:#f0dce5;margin:0 0 10px}
+.detail-card {border:1px solid var(--line);border-radius:12px;padding:13px;background:#100b1277}
+.detail-card p {margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+.trait {margin:10px 0}
+.trait span {display:block;font-size:12px;margin-bottom:6px}
+.track {height:4px;background:#382936;border-radius:9px;overflow:hidden}
+.track i {display:block;height:100%;width:var(--w);background:linear-gradient(90deg,#984057,#e17b8c);border-radius:9px}
+.tag {display:inline-block;border:1px solid #684052;color:#e7b8c5;border-radius:20px;padding:5px 8px;margin:3px 3px 0 0;font-size:10px}
+.footer-note {color:#948291;font-size:10px;line-height:1.55;border-top:1px solid var(--line);padding-top:13px}
+@media(max-width:1100px) {
+  .shell {grid-template-columns:300px minmax(320px,1fr)}
+  .details {grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr)}
+  .footer-note {grid-column:1/-1}
+}
+@media(max-width:700px) {
+  body {padding:0}
+  .shell {display:flex;flex-direction:column;gap:10px;min-height:100vh}
+  .panel {border-radius:0}
+  .character {min-height:0}
+  .portrait-wrap {min-height:330px}
+  .portrait {max-width:290px}
+  .character-caption {padding:2px 12px 12px}
+  .chat-panel {min-height:65vh}
+  .details {display:flex}
+  .message {max-width:94%}
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {animation:none!important;transition:none!important}
+}
+
+/* TESTAROSSA IMPERIAL ARCANE THEME */
+:root {
+  color-scheme: dark;
+  --bg: #08090e;
+  --panel: #11121b;
+  --panel2: #191824;
+  --red: #a82943;
+  --rose: #d45b70;
+  --gold: #c9a66e;
+  --text: #f3edf0;
+  --muted: #aaa3b4;
+  --line: #39303f;
+  --silver: #d7d6e4;
+  --emerald: #477e70;
+}
+
+* { scrollbar-color: #59404e #100f17; }
+
+body {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 50% 45%, #292034 0%, transparent 48%),
+    radial-gradient(ellipse at 5% 10%, #5a172b44, transparent 38%),
+    radial-gradient(ellipse at 95% 85%, #253c3a33, transparent 40%),
+    linear-gradient(135deg, #08090e, #100d17 55%, #090c12);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .42;
+  background-image:
+    radial-gradient(1px 1px at 8% 18%, #e8d8d9 99%, transparent),
+    radial-gradient(1px 1px at 23% 74%, #d9b5c5 99%, transparent),
+    radial-gradient(2px 2px at 42% 29%, #a8b7c5 99%, transparent),
+    radial-gradient(1px 1px at 67% 13%, #e8d8d9 99%, transparent),
+    radial-gradient(1px 1px at 82% 66%, #d9b5c5 99%, transparent),
+    radial-gradient(2px 2px at 94% 38%, #a8b7c5 99%, transparent);
+  background-size: 370px 330px;
+  animation: arcane-drift 42s linear infinite;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .16;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    #c5b4cf08 4px
+  );
+}
+
+@keyframes arcane-drift {
+  from { background-position: 0 0; }
+  to { background-position: 370px 330px; }
+}
+
+.shell {
+  position: relative;
+  gap: 16px;
+  width: min(1580px, 100%);
+}
+
+.panel {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(145deg, #191722f5, #101019f7 65%, #15111bf5);
+  border: 1px solid #574052;
+  border-radius: 20px;
+  box-shadow:
+    0 24px 70px #0009,
+    inset 0 1px 0 #ffffff0b,
+    0 0 28px #9b34400a;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 0% 0%, #9c40501c, transparent 48%),
+    radial-gradient(ellipse at 100% 100%, #426b6510, transparent 45%);
+}
+
+.brand,
+.chat-head {
+  border-color: #574052;
+  background: linear-gradient(90deg, #ffffff04, transparent);
+}
+
+.eyebrow {
+  color: #d6b77e;
+  letter-spacing: 3.5px;
+  text-shadow: 0 0 15px #c9a66e33;
+}
+
+.brand h1 {
+  color: #f1e8ed;
+  text-shadow: 0 0 24px #d4a4b322;
+  letter-spacing: 1px;
+}
+
+.sub, .connection, .hint { color: #aaa3b4; }
+
+.portrait-wrap {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 43%, #a02e4b30, transparent 42%),
+    radial-gradient(ellipse at 50% 55%, #7381a01a, transparent 68%);
+}
+
+.portrait-wrap::before {
+  content: "";
+  position: absolute;
+  width: min(82%, 340px);
+  aspect-ratio: 1;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      #c9a66e55 12%,
+      transparent 18%,
+      #a83b5b66 34%,
+      transparent 43%,
+      #8aa9a055 60%,
+      transparent 70%,
+      #c9a66e44 86%,
+      transparent
+    );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 1px),
+    #000 calc(100% - 1px),
+    #000 calc(100% - 2px),
+    transparent calc(100% - 1px)
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - 2px),
+    #000 calc(100% - 1px),
+    transparent 100%
+  );
+  animation: sigil-rotation 75s linear infinite;
+  pointer-events: none;
+}
+
+.portrait-wrap::after {
+  content: "";
+  position: absolute;
+  width: min(66%, 270px);
+  aspect-ratio: 1;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #c9a66e35;
+  border-radius: 50%;
+  box-shadow:
+    0 0 25px #a52d4d22,
+    inset 0 0 25px #a52d4d12;
+  pointer-events: none;
+}
+
+@keyframes sigil-rotation {
+  to { rotate: 360deg; }
+}
+
+.portrait {
+  position: relative;
+  z-index: 1;
+  filter:
+    drop-shadow(0 18px 28px #000b)
+    drop-shadow(0 0 16px #a8325022);
+}
+
+.character-caption h2 {
+  color: #eee4eb;
+  text-shadow: 0 0 20px #d4a4b333;
+}
+
+.character-caption p { color: #b7a9b6; }
+
+.presence {
+  position: relative;
+  background: linear-gradient(120deg, #19121dcc, #10171acc);
+  border-color: #655044;
+  box-shadow: inset 0 0 20px #a52d4d0a;
+}
+
+.presence strong { color: #e2b77e; }
+
+.chat-head h2,
+.details h3 {
+  color: #eee3eb;
+  text-shadow: 0 0 16px #c9a66e1c;
+}
+
+.dot {
+  box-shadow: 0 0 10px currentColor;
+}
+
+.mode {
+  background: #171620;
+  border-color: #514052;
+  transition: .25s ease;
+}
+
+.mode:hover {
+  border-color: #c9a66e;
+  color: #f0d9c5;
+}
+
+.mode.active {
+  color: #f4e8e9;
+  border-color: #a94a60;
+  background: linear-gradient(135deg, #67243a99, #27202d);
+  box-shadow: 0 0 18px #a52d4d1c, inset 0 0 12px #a52d4d15;
+}
+
+#chat {
+  background:
+    radial-gradient(ellipse at 50% 50%, #24202b20, transparent 75%);
+}
+
+.message {
+  border-color: #514052;
+  box-shadow: 0 5px 18px #0003;
+}
+
+.baby {
+  background: linear-gradient(135deg, #24202e, #191822);
+  border-left: 2px solid #bd8a70;
+  border-radius: 4px 15px 15px 15px;
+}
+
+.user {
+  background: linear-gradient(135deg, #49202f, #30202d);
+  border-color: #875064;
+  border-right: 2px solid #c9a66e;
+  border-radius: 15px 4px 15px 15px;
+}
+
+.composer {
+  border-color: #514052;
+  background: linear-gradient(0deg, #0c0c13cc, transparent);
+}
+
+textarea {
+  background: #0c0d14;
+  border-color: #514052;
+  box-shadow: inset 0 2px 10px #0005;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+textarea:focus {
+  border-color: #bd7180;
+  box-shadow: 0 0 0 2px #a52d4d22, inset 0 2px 10px #0005;
+}
+
+.send {
+  cursor: pointer;
+  background: linear-gradient(135deg, #79263e, #ad4057 60%, #956b50);
+  border: 1px solid #c08a79;
+  box-shadow: 0 5px 18px #8f294022, inset 0 1px #ffffff30;
+  transition: filter .2s, transform .2s, box-shadow .2s;
+}
+
+.send:hover:not(:disabled) {
+  filter: brightness(1.18);
+  transform: translateY(-1px);
+  box-shadow: 0 7px 22px #a52d4d44;
+}
+
+.detail-card {
+  background: linear-gradient(145deg, #191722cc, #101019dd);
+  border-color: #504052;
+  box-shadow: inset 0 1px #ffffff08;
+}
+
+.details h3 { color: #dfc9d1; }
+
+.track {
+  background: #292633;
+  box-shadow: inset 0 1px 3px #0008;
+}
+
+.track i {
+  background: linear-gradient(90deg, #783147, #bd6475 65%, #c9a66e);
+  box-shadow: 0 0 9px #b34a5b55;
+}
+
+.tag {
+  background: #17151f;
+  border-color: #705044;
+  color: #d9c1b7;
+  transition: .2s ease;
+}
+
+.tag:hover {
+  border-color: #c9a66e;
+  color: #f0dfc9;
+}
+
+.footer-note { border-color: #514052; }
+
+@media (max-width: 1100px) {
+  .shell { gap: 12px; }
+}
+
+@media (max-width: 700px) {
+  body { padding: 0; }
+  .panel { border-radius: 0; }
+  .portrait-wrap { min-height: 330px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .portrait-wrap::before {
+    animation: none !important;
+  }
+}
+
+</style>
+
+<style>
+#computer-awareness {
+  margin: 10px 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(185,154,104,.45);
+  border-radius: 12px;
+  background: rgba(23,25,35,.82);
+  color: #eee;
+  font-size: 12px;
+}
+#computer-awareness .computer-head {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; flex-wrap:wrap; margin-bottom:8px;
+}
+#computer-awareness h3 {
+  margin:0; color:#e8c98c; font-size:13px; letter-spacing:.04em;
+}
+#computer-awareness button {
+  border:1px solid #b99a68; border-radius:8px;
+  padding:6px 10px; background:#282332; color:#f2dfbd;
+  cursor:pointer; font:inherit;
+}
+#computer-awareness button:disabled { opacity:.55; cursor:wait; }
+#computer-awareness .computer-grid {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;
+}
+#computer-awareness .computer-item {
+  min-width:0; padding:8px; border-radius:8px;
+  background:rgba(10,12,19,.55); overflow-wrap:anywhere;
+}
+#computer-awareness .computer-label {
+  color:#c6a875; display:block; margin-bottom:4px;
+}
+#computer-awareness .computer-value { color:#f0edf2; }
+#computer-awareness #computer-updated {
+  display:block; margin-top:8px; color:#aaa2b2;
+}
+@media(max-width:700px) {
+  #computer-awareness .computer-grid { grid-template-columns:1fr; }
+}
+</style>
+
+
+<style id="homecoming-layout-stability-v1">
+/*
+ * HOMEcoming layout stability repair.
+ * This is deliberately an additive override: the existing theme,
+ * SVG portrait, chat logic, computer observer and approval flows remain.
+ */
+
+html {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+}
+
+body {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  margin: 0;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.shell {
+  width: min(1580px, 100%);
+  height: calc(100dvh - 24px);
+  min-height: 0;
+  max-height: calc(100dvh - 24px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns:
+    minmax(240px, .78fr)
+    minmax(380px, 1.55fr)
+    minmax(205px, .62fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.panel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.character {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.brand {
+  flex: 0 0 auto;
+}
+
+.portrait-wrap {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 350px;
+  max-height: 100%;
+  object-fit: contain;
+  flex: 0 1 auto;
+}
+
+.character-caption,
+.presence {
+  flex: 0 0 auto;
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.chat-head {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+#computer-awareness {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: 0;
+  max-height: min(30dvh, 260px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+#computer-awareness pre {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+#chat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-anchor: auto;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+#chat > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.message {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: min(85%, 900px);
+}
+
+.composer {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  min-width: 0;
+  background-color: #0c0c13;
+}
+
+#form {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+}
+
+#input {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+#send {
+  flex: 0 0 auto;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.detail-card,
+.trait,
+.footer-note {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.footer-note {
+  flex: 0 0 auto;
+}
+
+/* Keep the character and conversation side-by-side on medium screens.
+   The profile becomes a separate, independently scrollable lower row. */
+@media (max-width: 1100px) and (min-width: 701px) {
+  body {
+    padding: 10px;
+  }
+
+  .shell {
+    height: calc(100dvh - 20px);
+    max-height: calc(100dvh - 20px);
+    grid-template-columns: minmax(230px, .72fr) minmax(340px, 1.5fr);
+    grid-template-rows: minmax(0, 1fr) minmax(135px, 22dvh);
+    gap: 12px;
+  }
+
+  .character {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .chat-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .details {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: start;
+    align-items: start;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .details > div {
+    min-width: 0;
+  }
+
+  .details .footer-note {
+    grid-column: 1 / -1;
+  }
+
+  #computer-awareness {
+    max-height: min(25dvh, 210px);
+  }
+
+  .brand {
+    padding: 14px 15px 10px;
+  }
+
+  .brand h1 {
+    font-size: 25px;
+  }
+
+  .presence {
+    margin: 0 10px 10px;
+  }
+}
+
+/* Short desktop windows: preserve the chat viewport and reduce decoration. */
+@media (min-width: 701px) and (max-height: 760px) {
+  body {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .shell {
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .brand {
+    padding-top: 11px;
+    padding-bottom: 8px;
+  }
+
+  .brand h1 {
+    font-size: 25px;
+  }
+
+  .chat-head {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .composer {
+    padding: 10px;
+  }
+
+  .hint {
+    margin-top: 6px;
+  }
+
+  #computer-awareness {
+    max-height: 190px;
+  }
+
+  .character-caption {
+    padding-top: 4px;
+    padding-bottom: 8px;
+  }
+
+  .character-caption h2 {
+    font-size: 21px;
+  }
+
+  .presence {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+/* Mobile: allow the page to scroll, but keep the conversation self-contained. */
+@media (max-width: 700px) {
+  html {
+    min-height: 100%;
+    height: auto;
+  }
+
+  body {
+    height: auto;
+    min-height: 100dvh;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .shell {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: visible;
+  }
+
+  .panel {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .character {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .brand {
+    padding: 14px 18px 10px;
+  }
+
+  .portrait-wrap {
+    flex: 0 0 auto;
+    width: 100%;
+    height: clamp(250px, 40dvh, 370px);
+    min-height: 250px;
+    max-height: 370px;
+  }
+
+  .portrait {
+    width: 100%;
+    height: 100%;
+    max-width: 290px;
+    max-height: 100%;
+  }
+
+  .character-caption {
+    padding: 4px 12px 10px;
+  }
+
+  .presence {
+    margin: 0 14px 14px;
+  }
+
+  .chat-panel {
+    width: 100%;
+    height: min(78dvh, 760px);
+    min-height: 480px;
+    max-height: 760px;
+    flex: 0 0 auto;
+  }
+
+  .chat-head {
+    padding: 13px 14px;
+    flex-wrap: wrap;
+  }
+
+  .modes {
+    flex-wrap: wrap;
+  }
+
+  #computer-awareness {
+    max-height: 210px;
+    margin: 8px;
+  }
+
+  #chat {
+    flex: 1 1 0;
+    min-height: 0;
+    height: 0;
+    padding: 14px;
+  }
+
+  .message {
+    max-width: 94%;
+  }
+
+  .composer {
+    padding: 10px;
+  }
+
+  #form {
+    gap: 8px;
+  }
+
+  #input {
+    min-height: 48px;
+    max-height: 110px;
+    padding: 11px;
+  }
+
+  #send {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .details {
+    display: flex;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .footer-note {
+    margin-bottom: 8px;
+  }
+}
+
+/* Accessibility: honor reduced motion without disabling the normal design. */
+@media (prefers-reduced-motion: reduce) {
+  #chat {
+    scroll-behavior: auto;
+  }
+}
+</style>
+
+
+<style id="testarossa-fluid-ui-v2">
+/* Testarossa — fluid imperial interface */
+
+:root {
+  --ui-gap: clamp(9px, 1vw, 18px);
+  --ui-pad: clamp(9px, 1vw, 18px);
+  --ui-gold-soft: rgba(201,167,119,.24);
+  --ui-rose-glow: rgba(184,50,80,.16);
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+body {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding: var(--ui-pad);
+  overflow: hidden;
+}
+
+.shell {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  display: grid;
+  grid-template-columns:
+    minmax(220px, .76fr)
+    minmax(0, 2.15fr)
+    minmax(185px, .58fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--ui-gap);
+  overflow: hidden;
+}
+
+.panel {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  border-radius: clamp(12px, 1.2vw, 20px);
+}
+
+.character,
+.chat-panel,
+.details {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+}
+
+.character {
+  overflow: hidden;
+}
+
+.brand {
+  padding: clamp(12px, 1.4vw, 22px);
+}
+
+.brand h1 {
+  font-size: clamp(24px, 2vw, 34px);
+}
+
+.portrait-wrap {
+  min-height: 0;
+  flex: 1 1 0;
+  padding: 5px;
+}
+
+.portrait {
+  width: 100%;
+  height: 100%;
+  max-width: min(100%, 440px);
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.character-caption {
+  padding: 7px 12px 12px;
+}
+
+.presence {
+  margin: 0 clamp(8px, 1vw, 16px) clamp(8px, 1vw, 16px);
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(139,47,77,.10), transparent 55%),
+    linear-gradient(155deg, #171520f7, #0e0e16f8);
+}
+
+.chat-head {
+  padding: clamp(11px, 1.15vw, 20px) clamp(13px, 1.5vw, 25px);
+}
+
+.chat-head h2 {
+  font-size: clamp(19px, 1.5vw, 25px);
+}
+
+#computer-awareness {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  margin: 7px clamp(9px, 1.2vw, 20px);
+  padding: 0;
+  overflow: visible;
+  border: 1px solid rgba(185,154,104,.38);
+  border-radius: 12px;
+  background: linear-gradient(120deg, rgba(30,25,37,.94), rgba(15,17,26,.92));
+  box-shadow: inset 0 1px rgba(255,255,255,.025);
+}
+
+#computer-awareness:not([open]) {
+  flex: 0 0 auto;
+}
+
+#computer-awareness[open] {
+  max-height: min(38dvh, 370px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.computer-summary {
+  min-height: 42px;
+  padding: 9px 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.computer-summary::-webkit-details-marker {
+  display: none;
+}
+
+.computer-summary-title {
+  color: #e8c98c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .10em;
+}
+
+.computer-summary-hint {
+  min-width: 0;
+  margin-left: auto;
+  color: #a99cac;
+  font-size: 10px;
+  text-align: right;
+}
+
+.computer-chevron {
+  color: #d8b77e;
+  font-size: 17px;
+  transition: transform .2s ease;
+}
+
+#computer-awareness[open] .computer-chevron {
+  transform: rotate(180deg);
+}
+
+.computer-panel-content {
+  padding: 0 12px 12px;
+  border-top: 1px solid rgba(185,154,104,.15);
+}
+
+#computer-awareness .computer-head {
+  padding-top: 10px;
+}
+
+#computer-awareness .computer-head h3 {
+  display: none;
+}
+
+#computer-awareness .computer-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#computer-awareness .computer-item {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#computer-awareness pre {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+#chat {
+  flex: 1 1 0;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 0;
+  max-height: 100%;
+  padding: clamp(14px, 1.8vw, 30px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1vw, 15px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(90,52,83,.10), transparent 70%);
+}
+
+#chat > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.message {
+  width: fit-content;
+  max-width: min(96%, 1500px);
+  padding: clamp(11px, 1vw, 16px) clamp(13px, 1.2vw, 20px);
+  line-height: 1.58;
+  overflow-wrap: anywhere;
+  animation: testarossa-message-arrive .28s ease both;
+}
+
+.baby {
+  align-self: flex-start;
+}
+
+.user {
+  align-self: flex-end;
+  max-width: min(88%, 1200px);
+}
+
+@keyframes testarossa-message-arrive {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.composer {
+  flex: 0 0 auto;
+  padding: clamp(10px, 1.2vw, 19px);
+}
+
+#form {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 0;
+}
+
+#input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 0;
+  min-height: 52px;
+  max-height: 160px;
+  resize: vertical;
+}
+
+#send {
+  flex: 0 0 auto;
+  min-width: 76px;
+}
+
+.details {
+  padding: clamp(12px, 1.2vw, 20px);
+  gap: clamp(10px, 1vw, 17px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.detail-card {
+  padding: clamp(10px, 1vw, 15px);
+}
+
+.footer-note {
+  overflow-wrap: anywhere;
+}
+
+/* Very wide displays: conversation receives the extra room. */
+@media (min-width: 1600px) {
+  .shell {
+    grid-template-columns:
+      minmax(270px, .72fr)
+      minmax(0, 2.35fr)
+      minmax(205px, .55fr);
+  }
+
+  .message {
+    max-width: min(97%, 1800px);
+  }
+
+  .user {
+    max-width: min(90%, 1450px);
+  }
+}
+
+/* Compact desktop and tablet: profile becomes a lower information rail. */
+@media (max-width: 1100px) and (min-width: 701px) {
+  body {
+    padding: 8px;
+  }
+
+  .shell {
+    grid-template-columns: minmax(190px, .72fr) minmax(0, 1.8fr);
+    grid-template-rows: minmax(0, 1fr) minmax(105px, 19dvh);
+    gap: 9px;
+  }
+
+  .character {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .chat-panel {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .details {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: start;
+    align-items: start;
+    gap: 10px;
+    padding: 9px 12px;
+  }
+
+  .details > div {
+    min-width: 0;
+  }
+
+  .details .footer-note {
+    grid-column: 1 / -1;
+  }
+
+  .portrait-wrap {
+    min-height: 0;
+  }
+
+  .computer-summary-hint {
+    display: none;
+  }
+}
+
+/* Short windows: reduce chrome rather than shrinking the conversation. */
+@media (min-width: 701px) and (max-height: 700px) {
+  body {
+    padding: 6px;
+  }
+
+  .shell {
+    gap: 8px;
+  }
+
+  .brand {
+    padding: 9px 12px 7px;
+  }
+
+  .brand h1 {
+    font-size: 23px;
+  }
+
+  .chat-head {
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  .character-caption {
+    padding-top: 3px;
+    padding-bottom: 6px;
+  }
+
+  .character-caption h2 {
+    font-size: 19px;
+  }
+
+  .presence {
+    padding: 7px;
+    margin-bottom: 7px;
+  }
+
+  .composer {
+    padding: 8px;
+  }
+
+  #computer-awareness[open] {
+    max-height: 28dvh;
+  }
+}
+
+/* Mobile: natural document flow, with its own usable conversation area. */
+@media (max-width: 700px) {
+  html {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    height: auto;
+    min-height: 100dvh;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .shell {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    overflow: visible;
+  }
+
+  .panel {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  .character {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .brand {
+    padding: 13px 17px 9px;
+  }
+
+  .portrait-wrap {
+    flex: 0 0 auto;
+    width: 100%;
+    height: clamp(230px, 38dvh, 340px);
+    min-height: 230px;
+    max-height: 340px;
+  }
+
+  .portrait {
+    width: 100%;
+    height: 100%;
+    max-width: 285px;
+  }
+
+  .character-caption {
+    padding: 4px 12px 9px;
+  }
+
+  .presence {
+    margin: 0 12px 12px;
+  }
+
+  .chat-panel {
+    width: 100%;
+    height: min(76dvh, 760px);
+    min-height: 440px;
+    max-height: 760px;
+    flex: 0 0 auto;
+  }
+
+  .chat-head {
+    padding: 11px 13px;
+    flex-wrap: wrap;
+  }
+
+  .modes {
+    flex-wrap: wrap;
+  }
+
+  #computer-awareness {
+    margin: 6px 8px;
+  }
+
+  #computer-awareness[open] {
+    max-height: 32dvh;
+  }
+
+  .computer-summary-hint {
+    display: none;
+  }
+
+  #computer-awareness .computer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #chat {
+    flex: 1 1 0;
+    min-height: 0;
+    height: 0;
+    padding: 13px;
+  }
+
+  .message,
+  .user {
+    max-width: 96%;
+  }
+
+  .composer {
+    padding: 9px;
+  }
+
+  #input {
+    min-height: 48px;
+    max-height: 110px;
+    padding: 11px;
+  }
+
+  #send {
+    min-width: 62px;
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+
+  .details {
+    display: flex;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 15px;
+    gap: 13px;
+  }
+}
+
+/* Keep the interface usable when browser fullscreen is requested. */
+@media (display-mode: fullscreen) {
+  body {
+    padding: clamp(5px, .65vw, 12px);
+  }
+
+  .shell {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .computer-chevron {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  #chat {
+    scroll-behavior: auto;
+  }
+}
+</style>
+
+
+<style id="testarossa-side-panels-v3">
+/* Refined side-panel proportions and a useful profile presence card. */
+
+@media (min-width: 1101px) {
+  .shell {
+    grid-template-columns:
+      minmax(190px, .64fr)
+      minmax(0, 2.35fr)
+      minmax(165px, .48fr);
+  }
+}
+
+@media (min-width: 1600px) {
+  .shell {
+    grid-template-columns:
+      minmax(245px, .62fr)
+      minmax(0, 2.55fr)
+      minmax(185px, .45fr);
+  }
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(9px, .9vw, 15px);
+}
+
+.presence-card {
+  flex: 1 0 auto;
+  min-height: 155px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  padding: clamp(11px, 1vw, 15px);
+  border: 1px solid rgba(201,167,119,.25);
+  border-radius: 13px;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(184,50,80,.13), transparent 65%),
+    linear-gradient(145deg, rgba(35,27,39,.88), rgba(15,15,23,.92));
+  box-shadow: inset 0 1px rgba(255,255,255,.035);
+}
+
+.presence-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.presence-card-heading h3 {
+  margin: 3px 0 0;
+  font-size: clamp(13px, 1vw, 16px);
+}
+
+.presence-orb {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #c98b9c;
+  box-shadow: 0 0 10px rgba(201,139,156,.65);
+}
+
+.presence-intro {
+  margin: 0;
+  color: #b8acbb;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.presence-capability {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(201,167,119,.10);
+}
+
+.presence-symbol {
+  flex: 0 0 19px;
+  color: #d8b77e;
+  text-align: center;
+  font-size: 15px;
+}
+
+.presence-capability > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.presence-capability strong {
+  color: #e5dce5;
+  font-size: 10px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.presence-capability span:not(.presence-symbol) {
+  color: #a99cac;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.presence-card-foot {
+  margin-top: auto;
+  padding-top: 5px;
+  color: #c5a77d;
+  font-size: 9px;
+  font-style: italic;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .presence-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .presence-card {
+    flex: 0 0 auto;
+  }
+}
+</style>
+
+
+<style id="testarossa-balanced-sides-v4">
+/* Balanced character and profile rails; conversation remains dominant. */
+
+@media (min-width: 1101px) {
+  .shell {
+    grid-template-columns:
+      minmax(165px, .48fr)
+      minmax(0, 2.55fr)
+      minmax(165px, .48fr);
+  }
+
+  .character,
+  .details {
+    min-width: 0;
+  }
+
+  .portrait-wrap {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .portrait {
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+@media (min-width: 1600px) {
+  .shell {
+    grid-template-columns:
+      minmax(185px, .48fr)
+      minmax(0, 2.55fr)
+      minmax(185px, .48fr);
+  }
+}
+</style>
+
+
+<style id="testarossa-imperial-chat-v5">
+/* Testarossa — Imperial Arcane conversation styling */
+
+#chat {
+  scroll-behavior: smooth;
+  scrollbar-color: rgba(190,139,151,.35) transparent;
+}
+
+.message {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 13px clamp(14px, 1.25vw, 21px);
+  line-height: 1.72;
+  letter-spacing: .008em;
+  box-shadow:
+    0 7px 22px rgba(0,0,0,.20),
+    inset 0 1px rgba(255,255,255,.035);
+  transition:
+    border-color .25s ease,
+    box-shadow .25s ease,
+    transform .25s ease;
+}
+
+/* Speaker signatures */
+.message::before {
+  display: block;
+  margin: 0 0 7px;
+  font-family: Georgia, serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  line-height: 1.3;
+}
+
+.baby::before {
+  content: "TESTAROSSA  ·  IMPERIAL PRESENCE";
+  color: #d9a6b3;
+  text-shadow: 0 0 12px rgba(205,124,153,.25);
+}
+
+.user::before {
+  content: "MASTER";
+  color: #d9bd8b;
+}
+
+/* Fine luminous edge */
+.baby {
+  border-color: rgba(190,125,151,.43);
+  background:
+    linear-gradient(115deg, rgba(174,91,124,.075), transparent 48%),
+    linear-gradient(135deg, #28202f, #191822);
+  box-shadow:
+    0 7px 22px rgba(0,0,0,.22),
+    inset 2px 0 rgba(202,133,158,.72),
+    inset 0 1px rgba(255,255,255,.035);
+}
+
+.user {
+  border-color: rgba(201,166,110,.40);
+  background:
+    linear-gradient(245deg, rgba(201,166,110,.07), transparent 55%),
+    linear-gradient(135deg, #492432, #2c202d);
+  box-shadow:
+    0 7px 22px rgba(0,0,0,.22),
+    inset -2px 0 rgba(201,166,110,.72),
+    inset 0 1px rgba(255,255,255,.035);
+}
+
+/* Gentle hover response, without moving the chat layout */
+.baby:hover {
+  border-color: rgba(213,151,174,.68);
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.25),
+    0 0 18px rgba(180,91,128,.09),
+    inset 2px 0 rgba(213,151,174,.82);
+}
+
+.user:hover {
+  border-color: rgba(220,188,132,.62);
+  box-shadow:
+    0 8px 25px rgba(0,0,0,.25),
+    0 0 15px rgba(201,166,110,.07),
+    inset -2px 0 rgba(220,188,132,.82);
+}
+
+/* Soft arrival animation for each new message */
+@keyframes testarossa-arcane-arrival {
+  0% {
+    opacity: 0;
+    transform: translateY(11px) scale(.992);
+    filter: brightness(1.22);
+  }
+  65% {
+    opacity: 1;
+    filter: brightness(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+.message {
+  animation: testarossa-arcane-arrival .42s cubic-bezier(.2,.75,.25,1) both;
+}
+
+/* A small pulse while the existing request is in progress */
+#send:disabled {
+  opacity: .82;
+  border-color: rgba(207,145,166,.65);
+  box-shadow: 0 0 15px rgba(190,91,128,.18);
+  animation: testarossa-thinking-pulse 1.5s ease-in-out infinite;
+  cursor: progress;
+}
+
+@keyframes testarossa-thinking-pulse {
+  0%, 100% {
+    box-shadow: 0 0 7px rgba(190,91,128,.12);
+    filter: brightness(.94);
+  }
+  50% {
+    box-shadow: 0 0 19px rgba(210,130,157,.34);
+    filter: brightness(1.12);
+  }
+}
+
+/* Keep long messages and narrow screens comfortable */
+.message {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+@media (max-width: 700px) {
+  .message {
+    line-height: 1.65;
+    padding: 12px 13px;
+  }
+
+  .message::before {
+    font-size: 8px;
+  }
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  #send:disabled {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+
+
+<style id="testarossa-imperial-garden-v6">
+/* ==========================================================
+   TESTAROSSA — THE IMPERIAL ROSE GARDEN
+   Living floral architecture, expressive typography,
+   animated conversation and a quiet magical atmosphere.
+   ========================================================== */
+
+:root {
+  --garden-rose: #e6a0b5;
+  --garden-blush: #f0c5d0;
+  --garden-gold: #d8b77e;
+  --garden-leaf: #829b78;
+  --garden-ink: #17131e;
+  --garden-glow: rgba(222,151,177,.19);
+}
+
+/* A softer, deeper garden atmosphere. */
+body {
+  background:
+    radial-gradient(ellipse at 8% 12%, rgba(130,62,91,.17), transparent 34%),
+    radial-gradient(ellipse at 92% 86%, rgba(104,123,91,.13), transparent 38%),
+    linear-gradient(145deg, #100e17, #19131e 52%, #100f18);
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+
+.shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.shell > .panel,
+.shell > .chat-panel {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(190,145,133,.35);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.25),
+    inset 0 0 0 1px rgba(255,224,218,.025),
+    inset 0 0 35px rgba(145,77,104,.035);
+}
+
+/* Fine botanical filigree in the panel corners. */
+.shell > .panel::before,
+.shell > .chat-panel::before {
+  content: "❧";
+  position: absolute;
+  z-index: 5;
+  top: 5px;
+  left: 9px;
+  color: rgba(194,161,122,.65);
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 12px rgba(214,160,174,.22);
+}
+
+.shell > .panel::after,
+.shell > .chat-panel::after {
+  content: "❀";
+  position: absolute;
+  z-index: 5;
+  right: 9px;
+  bottom: 6px;
+  color: rgba(220,154,177,.68);
+  font-size: 16px;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 12px rgba(220,154,177,.3);
+}
+
+/* The character's garden chamber. */
+.character {
+  border-color: rgba(196,145,153,.48) !important;
+  background:
+    radial-gradient(ellipse at 50% 25%, rgba(159,70,104,.15), transparent 60%),
+    linear-gradient(165deg, #211822, #15131d 75%) !important;
+}
+
+.character .brand h1 {
+  font-family: "Palatino Linotype", Georgia, serif;
+  font-weight: 500;
+  letter-spacing: .055em;
+  background: linear-gradient(100deg, #fff0e8, #e9b5c7, #d9c18f, #fff0e8);
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: garden-title-glow 9s ease-in-out infinite;
+}
+
+.character-caption h2,
+.details h3,
+.chat-head h2 {
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  letter-spacing: .025em;
+}
+
+.eyebrow,
+.computer-summary-title {
+  font-family: Georgia, serif;
+  letter-spacing: .17em;
+}
+
+/* Subtle garden frame around the portrait. */
+.portrait-wrap {
+  border-radius: 16px;
+}
+
+.portrait-wrap::after {
+  content: "✿  ❧  ✿";
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
+  color: rgba(225,169,185,.68);
+  font-size: 17px;
+  letter-spacing: 9px;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: 0 0 14px rgba(221,155,181,.4);
+  animation: garden-flower-breathe 5s ease-in-out infinite;
+}
+
+/* The profile becomes a little botanical journal. */
+.details {
+  border-color: rgba(185,151,124,.4) !important;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(157,77,105,.13), transparent 50%),
+    linear-gradient(155deg, #211923, #14131c) !important;
+}
+
+.details .detail-card {
+  border: 1px solid rgba(193,151,139,.18);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(83,49,65,.25), rgba(27,24,34,.48));
+}
+
+.details .trait .track {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.details .trait .track i {
+  background: linear-gradient(90deg, #8b596c, #dca2b2, #d6bb86) !important;
+  box-shadow: 0 0 9px rgba(219,157,178,.22);
+}
+
+.details .tag {
+  border-radius: 20px;
+  background: rgba(72,46,62,.48);
+  border-color: rgba(198,153,137,.4);
+  color: #e7c9cf;
+}
+
+/* Chat typography: readable, expressive, and elegant. */
+#chat {
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(14px, .95vw, 16px);
+  line-height: 1.8;
+  scrollbar-color: rgba(193,137,156,.4) transparent;
+}
+
+.message {
+  overflow: visible;
+  position: relative;
+  isolation: isolate;
+  border-radius: 15px;
+  font-family: "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: clamp(14px, .95vw, 16px);
+  line-height: 1.85;
+  letter-spacing: .012em;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.2),
+    inset 0 1px rgba(255,255,255,.045);
+}
+
+.message::after {
+  content: "✧";
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  color: rgba(224,190,159,.45);
+  font-size: 12px;
+  pointer-events: none;
+  animation: garden-sparkle 4s ease-in-out infinite;
+}
+
+.message-content {
+  display: inline;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Each new word enters with its own graceful motion. */
+.animated-word {
+  display: inline;
+  animation: garden-word-arrive .48s cubic-bezier(.2,.7,.2,1) both;
+  animation-delay: var(--word-delay, 0ms);
+}
+
+/* Testarossa: rose, pearl and soft champagne. */
+.message.baby {
+  background:
+    linear-gradient(135deg, rgba(68,42,61,.97), rgba(32,27,41,.98)) !important;
+  border-color: rgba(205,151,169,.5) !important;
+  border-left: 2px solid #d9a2b4 !important;
+  box-shadow:
+    0 7px 25px rgba(0,0,0,.2),
+    inset 0 0 25px rgba(213,146,171,.055),
+    0 0 13px rgba(197,116,150,.055);
+}
+
+.message.baby .message-content {
+  color: #f0dfe5;
+}
+
+.message.baby .animated-word {
+  background: linear-gradient(100deg, #f7e9e9 5%, #e8c4d1 48%, #f1d9b9 90%);
+  background-size: 180% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Your messages: warmer gold and ivory. */
+.message.user {
+  background:
+    linear-gradient(135deg, rgba(72,39,49,.98), rgba(42,29,39,.98)) !important;
+  border-color: rgba(205,167,124,.42) !important;
+  border-right: 2px solid #d5b37c !important;
+  box-shadow:
+    0 7px 22px rgba(0,0,0,.2),
+    inset 0 0 22px rgba(205,169,122,.045);
+}
+
+.message.user .message-content {
+  color: #f0e5d6;
+}
+
+.message.user .animated-word {
+  background: linear-gradient(100deg, #fff0d9 5%, #e5c99e 52%, #f8e8d6 95%);
+  background-size: 170% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* New messages get a brief highlight, not endless movement. */
+.message.baby,
+.message.user {
+  animation: garden-message-arrive .65s cubic-bezier(.18,.72,.25,1) both;
+}
+
+.message:hover {
+  border-color: rgba(224,174,185,.7);
+  box-shadow:
+    0 9px 28px rgba(0,0,0,.25),
+    0 0 16px rgba(218,151,177,.10);
+}
+
+/* Composer: a little enchanted writing desk. */
+.composer {
+  border-top-color: rgba(197,151,151,.32) !important;
+  background:
+    linear-gradient(90deg, rgba(93,51,68,.13), transparent 45%, rgba(130,106,70,.09)),
+    #0c0c13 !important;
+}
+
+#input {
+  font-family: "Palatino Linotype", Georgia, serif;
+  color: #f0e2df;
+  caret-color: #e6a9bd;
+}
+
+#input:focus {
+  border-color: rgba(220,160,180,.72);
+  box-shadow: 0 0 0 3px rgba(205,126,158,.09), 0 0 17px rgba(205,126,158,.1);
+}
+
+#send {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#send:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 17px rgba(219,159,180,.19);
+}
+
+#send:disabled {
+  animation: garden-waiting 1.5s ease-in-out infinite;
+}
+
+/* A few floating petals in the page atmosphere. */
+body::after {
+  content: "✿";
+  position: fixed;
+  z-index: 20;
+  top: 17%;
+  left: 1.5%;
+  color: rgba(227,160,183,.48);
+  font-size: 16px;
+  pointer-events: none;
+  animation: garden-petal-drift 13s ease-in-out infinite;
+  text-shadow: 0 0 12px rgba(218,144,174,.3);
+}
+
+.shell::before {
+  content: "❀";
+  position: fixed;
+  z-index: 20;
+  right: 2%;
+  top: 72%;
+  color: rgba(219,170,181,.4);
+  font-size: 13px;
+  pointer-events: none;
+  animation: garden-petal-drift 17s ease-in-out infinite reverse;
+}
+
+/* The computer-awareness drawer gets matching botanical details. */
+#computer-awareness {
+  border-color: rgba(193,151,127,.38) !important;
+  background:
+    linear-gradient(115deg, rgba(63,42,56,.5), rgba(19,19,28,.94)) !important;
+}
+
+.computer-summary-title {
+  color: #e7c49a !important;
+}
+
+/* Animation definitions. */
+@keyframes garden-word-arrive {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes garden-message-arrive {
+  from { opacity: 0; transform: translateY(10px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes garden-title-glow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes garden-flower-breathe {
+  0%, 100% { opacity: .55; filter: drop-shadow(0 0 2px rgba(224,160,180,.15)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px rgba(224,160,180,.45)); }
+}
+
+@keyframes garden-sparkle {
+  0%, 100% { opacity: .35; transform: rotate(0deg) scale(.85); }
+  50% { opacity: .9; transform: rotate(35deg) scale(1.15); }
+}
+
+@keyframes garden-petal-drift {
+  0% { transform: translate3d(0,0,0) rotate(0deg); opacity: .2; }
+  30% { transform: translate3d(12px,22px,0) rotate(65deg); opacity: .65; }
+  70% { transform: translate3d(-5px,48px,0) rotate(145deg); opacity: .4; }
+  100% { transform: translate3d(8px,75px,0) rotate(220deg); opacity: .1; }
+}
+
+@keyframes garden-waiting {
+  0%, 100% { box-shadow: 0 0 4px rgba(221,157,181,.12); }
+  50% { box-shadow: 0 0 17px rgba(221,157,181,.38); }
+}
+
+/* Mobile: keep decorations delicate and prevent clipping. */
+@media (max-width: 700px) {
+  .shell > .panel::before,
+  .shell > .panel::after,
+  .shell > .chat-panel::before,
+  .shell > .chat-panel::after {
+    font-size: 13px;
+  }
+
+  #chat {
+    font-size: 14px;
+  }
+
+  .message {
+    line-height: 1.72;
+  }
+}
+
+/* Accessibility: all decorative and entrance motion can be disabled. */
+@media (prefers-reduced-motion: reduce) {
+  .animated-word,
+  .message,
+  .message::after,
+  .character .brand h1,
+  .portrait-wrap::after,
+  body::after,
+  .shell::before,
+  #send:disabled {
+    animation: none !important;
+    transition: none !important;
+    filter: none !important;
+  }
+
+  .animated-word {
+    opacity: 1;
+    transform: none;
+  }
+}
+</style>
+
+
+<style id="testarossa-imperial-garden-v7">
+/* IMPERIAL ROSE GARDEN — BOTANICAL ARCHITECTURE */
+
+/* Deep garden atmosphere */
+html, body {
+  background-color: #100d15 !important;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse at 50% 4%,
+      rgba(145,65,91,.28), transparent 47%),
+    radial-gradient(ellipse at 4% 55%,
+      rgba(66,100,69,.18), transparent 35%),
+    radial-gradient(ellipse at 97% 72%,
+      rgba(120,64,82,.18), transparent 38%),
+    radial-gradient(ellipse at 50% 100%,
+      rgba(115,77,83,.14), transparent 55%),
+    linear-gradient(145deg,#100c16,#1b131e 48%,#100e17) !important;
+}
+
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:.55;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      transparent 30%,rgba(7,5,12,.48) 100%),
+    radial-gradient(2px 2px at 12% 19%,
+      rgba(246,207,215,.65) 45%,transparent 70%),
+    radial-gradient(2px 2px at 82% 32%,
+      rgba(231,198,151,.65) 45%,transparent 70%),
+    radial-gradient(1px 1px at 65% 77%,
+      rgba(246,207,215,.7) 45%,transparent 70%);
+  background-size:auto,310px 270px,370px 330px,280px 300px;
+  animation: rose-garden-atmosphere 18s ease-in-out infinite alternate;
+}
+
+.shell {
+  position:relative;
+  z-index:1;
+}
+
+/* Botanical artwork around each architectural panel.
+   The SVG artwork is supplied as an inline data URI. */
+.shell > .panel {
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid rgba(198,157,143,.43) !important;
+  border-radius:clamp(15px,1.3vw,23px);
+  background-color:rgba(25,19,29,.94);
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.37),
+    inset 0 0 0 1px rgba(255,228,213,.055),
+    inset 0 0 38px rgba(156,84,105,.075),
+    0 0 22px rgba(175,91,117,.075);
+}
+
+.shell > .panel::before,
+.shell > .panel::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  width:auto;
+  height:auto;
+  pointer-events:none;
+  background-image:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%0A%20viewBox%3D%220%200%20120%20900%22%20preserveAspectRatio%3D%22none%22%3E%0A%20%3Cdefs%3E%0A%20%20%3ClinearGradient%20id%3D%22stem%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%220%22%3E%0A%20%20%20%3Cstop%20stop-color%3D%22%23405e48%22%2F%3E%0A%20%20%20%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%2391a77c%22%2F%3E%0A%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23c2a47b%22%2F%3E%0A%20%20%3C%2FlinearGradient%3E%0A%20%20%3CradialGradient%20id%3D%22petal%22%3E%0A%20%20%20%3Cstop%20stop-color%3D%22%23ffe4e8%22%2F%3E%0A%20%20%20%3Cstop%20offset%3D%22.48%22%20stop-color%3D%22%23d987a3%22%2F%3E%0A%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2371324d%22%2F%3E%0A%20%20%3C%2FradialGradient%3E%0A%20%20%3CradialGradient%20id%3D%22bud%22%3E%0A%20%20%20%3Cstop%20stop-color%3D%22%23f8d9df%22%2F%3E%0A%20%20%20%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23a94d70%22%2F%3E%0A%20%20%3C%2FradialGradient%3E%0A%20%3C%2Fdefs%3E%0A%0A%20%3C%21--%20Main%20climbing%20stems%20--%3E%0A%20%3Cpath%20d%3D%22M12%20900%20C65%20820%2012%20755%2058%20675%0A%20C103%20595%2020%20520%2057%20432%0A%20C92%20350%2018%20283%2057%20200%0A%20C88%20130%2038%2065%2071%200%22%0A%20fill%3D%22none%22%20stroke%3D%22url%28%23stem%29%22%20stroke-width%3D%224%22%0A%20stroke-linecap%3D%22round%22%2F%3E%0A%20%3Cpath%20d%3D%22M17%20900%20C-5%20815%2094%20760%2067%20695%0A%20M58%20675%20C15%20610%20110%20553%2076%20493%0A%20M57%20432%20C105%20376%204%20315%2035%20265%0A%20M57%20200%20C5%20145%20112%2098%2071%200%22%0A%20fill%3D%22none%22%20stroke%3D%22%23a8a078%22%20stroke-width%3D%221.3%22%0A%20opacity%3D%22.8%22%2F%3E%0A%0A%20%3C%21--%20Leaves%20--%3E%0A%20%3Cg%20fill%3D%22%2354775a%22%20stroke%3D%22%23a3a87c%22%20stroke-width%3D%221.1%22%3E%0A%20%20%3Cpath%20d%3D%22M38%20806%20Q-2%20778%205%20743%20Q39%20750%2038%20806Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M42%20790%20Q81%20760%2092%20782%20Q76%20817%2042%20790Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M49%20650%20Q8%20633%2010%20600%20Q44%20600%2049%20650Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M52%20620%20Q91%20585%20104%20613%20Q82%20650%2052%20620Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M44%20490%20Q4%20475%2012%20443%20Q45%20445%2044%20490Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M62%20460%20Q99%20425%20110%20450%20Q94%20487%2062%20460Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M39%20300%20Q-2%20282%205%20250%20Q40%20251%2039%20300Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M51%20275%20Q88%20239%20104%20267%20Q83%20303%2051%20275Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M60%20145%20Q21%20130%2024%2096%20Q59%2099%2060%20145Z%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M68%20113%20Q103%2083%20115%20110%20Q92%20144%2068%20113Z%22%2F%3E%0A%20%3C%2Fg%3E%0A%20%3Cg%20fill%3D%22none%22%20stroke%3D%22%23c5b58c%22%20stroke-width%3D%221%22%20opacity%3D%22.75%22%3E%0A%20%20%3Cpath%20d%3D%22M38%20806%20L5%20743%20M42%20790%20L92%20782%0A%20%20%20M49%20650%20L10%20600%20M52%20620%20L104%20613%0A%20%20%20M44%20490%20L12%20443%20M62%20460%20L110%20450%0A%20%20%20M39%20300%20L5%20250%20M51%20275%20L104%20267%0A%20%20%20M60%20145%20L24%2096%20M68%20113%20L115%20110%22%2F%3E%0A%20%3C%2Fg%3E%0A%0A%20%3C%21--%20Rose%20blossoms%20--%3E%0A%20%3Cg%3E%0A%20%20%3Cg%20transform%3D%22translate%2858%20675%29%22%3E%0A%20%20%20%3Ccircle%20r%3D%2224%22%20fill%3D%22%2371354e%22%20opacity%3D%22.75%22%2F%3E%0A%20%20%20%3Cg%20fill%3D%22url%28%23petal%29%22%3E%0A%20%20%20%20%3Cellipse%20cy%3D%22-12%22%20rx%3D%2211%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cy%3D%2212%22%20rx%3D%2211%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-12%22%20rx%3D%2216%22%20ry%3D%2211%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2212%22%20rx%3D%2216%22%20ry%3D%2211%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-9%22%20cy%3D%22-9%22%20rx%3D%2212%22%20ry%3D%2215%22%20transform%3D%22rotate%28-45%20-9%20-9%29%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%229%22%20cy%3D%229%22%20rx%3D%2212%22%20ry%3D%2215%22%20transform%3D%22rotate%28-45%209%209%29%22%2F%3E%0A%20%20%20%3C%2Fg%3E%0A%20%20%20%3Ccircle%20r%3D%227%22%20fill%3D%22%23f4c58d%22%2F%3E%0A%20%20%20%3Ccircle%20r%3D%223%22%20fill%3D%22%23854358%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20transform%3D%22translate%2857%20432%29%20scale%28.78%29%22%3E%0A%20%20%20%3Ccircle%20r%3D%2225%22%20fill%3D%22%2371354e%22%20opacity%3D%22.7%22%2F%3E%0A%20%20%20%3Cg%20fill%3D%22url%28%23petal%29%22%3E%0A%20%20%20%20%3Cellipse%20cy%3D%22-12%22%20rx%3D%2212%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cy%3D%2212%22%20rx%3D%2212%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-12%22%20rx%3D%2216%22%20ry%3D%2212%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2212%22%20rx%3D%2216%22%20ry%3D%2212%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-8%22%20cy%3D%22-8%22%20rx%3D%2213%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%228%22%20cy%3D%228%22%20rx%3D%2213%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%3C%2Fg%3E%0A%20%20%20%3Ccircle%20r%3D%227%22%20fill%3D%22%23f2c58e%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20transform%3D%22translate%2857%20200%29%20scale%28.9%29%22%3E%0A%20%20%20%3Ccircle%20r%3D%2223%22%20fill%3D%22%2371354e%22%20opacity%3D%22.7%22%2F%3E%0A%20%20%20%3Cg%20fill%3D%22url%28%23petal%29%22%3E%0A%20%20%20%20%3Cellipse%20cy%3D%22-11%22%20rx%3D%2212%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cy%3D%2211%22%20rx%3D%2212%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-11%22%20rx%3D%2216%22%20ry%3D%2212%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2211%22%20rx%3D%2216%22%20ry%3D%2212%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%22-8%22%20cy%3D%22-8%22%20rx%3D%2213%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%20%3Cellipse%20cx%3D%228%22%20cy%3D%228%22%20rx%3D%2213%22%20ry%3D%2216%22%2F%3E%0A%20%20%20%3C%2Fg%3E%0A%20%20%20%3Ccircle%20r%3D%227%22%20fill%3D%22%23f2c58e%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%3C%2Fg%3E%0A%0A%20%3C%21--%20Buds%20and%20tiny%20flowers%20--%3E%0A%20%3Cg%20fill%3D%22url%28%23bud%29%22%20stroke%3D%22%23d6a4a2%22%20stroke-width%3D%221%22%3E%0A%20%20%3Ccircle%20cx%3D%2217%22%20cy%3D%22565%22%20r%3D%228%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2294%22%20cy%3D%22350%22%20r%3D%227%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2225%22%20cy%3D%2280%22%20r%3D%228%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2291%22%20cy%3D%22760%22%20r%3D%226%22%2F%3E%0A%20%3C%2Fg%3E%0A%20%3Cg%20fill%3D%22%23e7c18b%22%3E%0A%20%20%3Ccircle%20cx%3D%2217%22%20cy%3D%22565%22%20r%3D%222%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2294%22%20cy%3D%22350%22%20r%3D%222%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%2225%22%20cy%3D%2280%22%20r%3D%222%22%2F%3E%0A%20%3C%2Fg%3E%0A%3C%2Fsvg%3E');
+  background-repeat:no-repeat;
+  background-size:clamp(48px,5vw,82px) 100%;
+  opacity:.67;
+  color:transparent;
+  text-shadow:none;
+  font-size:0;
+  animation:rose-vine-breath 11s ease-in-out infinite alternate;
+}
+
+.shell > .panel::before {
+  background-position:left center;
+}
+
+.shell > .panel::after {
+  background-position:left center;
+  transform:scaleX(-1);
+  opacity:.52;
+  animation-delay:-5s;
+}
+
+/* Keep every existing control and character element above the artwork. */
+.shell > .panel > * {
+  position:relative;
+  z-index:1;
+}
+
+/* The three spaces share one architectural language. */
+.character {
+  background:
+    radial-gradient(ellipse at 50% 24%,
+      rgba(178,76,111,.22),transparent 55%),
+    linear-gradient(160deg,rgba(43,27,40,.97),rgba(18,16,25,.98))
+    !important;
+}
+
+.chat-panel {
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(155,73,104,.13),transparent 56%),
+    linear-gradient(155deg,rgba(30,23,34,.98),rgba(16,15,24,.98))
+    !important;
+}
+
+.details {
+  background:
+    radial-gradient(ellipse at 90% 10%,
+      rgba(164,87,110,.17),transparent 55%),
+    linear-gradient(155deg,rgba(39,28,37,.98),rgba(19,17,25,.98))
+    !important;
+}
+
+/* A sanctuary for her existing animated portrait. */
+.portrait-wrap {
+  position:relative;
+  border:1px solid rgba(211,163,157,.43);
+  border-radius:48% 48% 17px 17px;
+  background:
+    radial-gradient(ellipse at 50% 40%,
+      rgba(185,88,120,.19),transparent 67%),
+    linear-gradient(180deg,rgba(255,224,229,.035),rgba(40,25,39,.28));
+  box-shadow:
+    0 0 0 5px rgba(184,126,132,.055),
+    0 0 30px rgba(190,94,130,.14),
+    inset 0 0 24px rgba(225,168,181,.075);
+}
+
+.portrait-wrap::before {
+  content:"";
+  position:absolute;
+  inset:8px;
+  z-index:2;
+  border:1px solid rgba(218,181,146,.28);
+  border-radius:48% 48% 13px 13px;
+  pointer-events:none;
+  box-shadow:inset 0 0 18px rgba(215,157,172,.08);
+}
+
+.portrait {
+  filter:drop-shadow(0 9px 20px rgba(0,0,0,.28))
+         drop-shadow(0 0 12px rgba(208,131,157,.14));
+}
+
+/* Botanical title treatment */
+.character .brand h1 {
+  text-shadow:0 0 24px rgba(221,143,169,.24);
+  letter-spacing:.075em;
+}
+
+.character .brand .eyebrow {
+  color:#d9b89a;
+}
+
+.character .brand .sub {
+  color:#d7bdc6;
+}
+
+/* Conversation remains readable and central. */
+.chat-panel #chat {
+  position:relative;
+  z-index:1;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      rgba(105,67,83,.055),transparent 70%);
+}
+
+.chat-panel .message {
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+
+/* A little more depth in the profile journal. */
+.details .detail-card {
+  border-color:rgba(204,159,151,.34);
+  box-shadow:inset 0 1px rgba(255,237,225,.055),
+             0 7px 18px rgba(0,0,0,.13);
+}
+
+.details h3 {
+  color:#e6c2c7;
+  text-shadow:0 0 13px rgba(210,143,162,.12);
+}
+
+.details .tag {
+  border-color:rgba(198,158,133,.43);
+}
+
+/* Composer becomes a writing desk within the garden. */
+.composer {
+  border-top:1px solid rgba(203,155,148,.3) !important;
+  box-shadow:0 -8px 24px rgba(0,0,0,.12);
+}
+
+/* Quiet living atmosphere; no constant motion on old messages. */
+@keyframes rose-garden-atmosphere {
+  from { opacity:.35; }
+  to { opacity:.72; }
+}
+
+@keyframes rose-vine-breath {
+  from { opacity:.48; }
+  to { opacity:.76; }
+}
+
+/* Smaller displays: retain botanical edges without crowding. */
+@media(max-width:700px) {
+  .shell > .panel::before,
+  .shell > .panel::after {
+    background-size:43px 100%;
+    opacity:.38;
+  }
+
+  .portrait-wrap {
+    border-radius:30px;
+  }
+
+  .portrait-wrap::before {
+    border-radius:25px;
+  }
+}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce) {
+  body::before,
+  .shell > .panel::before,
+  .shell > .panel::after {
+    animation:none !important;
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="shell">
+
+<section class="panel character">
+  <div class="brand">
+    <div class="eyebrow">Personal presence</div>
+    <h1>Testarossa</h1>
+    <div class="sub">Independent presence · Imperial arcane interface</div>
+  </div>
+
+  <div class="portrait-wrap">
+  <svg id="portrait" class="portrait" data-expression="idle"
+       viewBox="0 0 500 650" role="img"
+       aria-label="Code-rendered portrait of Testarossa">
+    <defs>
+      <linearGradient id="hairBase" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff"/>
+        <stop offset=".25" stop-color="#f7f0f7"/>
+        <stop offset=".58" stop-color="#d8d0e1"/>
+        <stop offset=".82" stop-color="#f6eff7"/>
+        <stop offset="1" stop-color="#aaa0b7"/>
+      </linearGradient>
+      <linearGradient id="hairShade" x1="0" y1="0" x2="1" y2=".4">
+        <stop offset="0" stop-color="#9b91aa"/>
+        <stop offset=".45" stop-color="#eee8f1"/>
+        <stop offset="1" stop-color="#b5aabd"/>
+      </linearGradient>
+      <linearGradient id="skinBase" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ffe8dc"/>
+        <stop offset=".45" stop-color="#f4cabb"/>
+        <stop offset="1" stop-color="#d99f9c"/>
+      </linearGradient>
+      <radialGradient id="skinLight" cx=".35" cy=".25" r=".8">
+        <stop offset="0" stop-color="#fff2e9" stop-opacity=".8"/>
+        <stop offset="1" stop-color="#d38e91" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="iris" cx=".35" cy=".25" r=".8">
+        <stop offset="0" stop-color="#ffb1a9"/>
+        <stop offset=".25" stop-color="#e34b60"/>
+        <stop offset=".65" stop-color="#a20f36"/>
+        <stop offset="1" stop-color="#480d27"/>
+      </radialGradient>
+      <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#421c2d"/>
+        <stop offset=".5" stop-color="#21121e"/>
+        <stop offset="1" stop-color="#100d15"/>
+      </linearGradient>
+      <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f1d6a2"/>
+        <stop offset=".5" stop-color="#b58a53"/>
+        <stop offset="1" stop-color="#f5d6a1"/>
+      </linearGradient>
+      <radialGradient id="backGlow">
+        <stop offset="0" stop-color="#b13b5c" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#b13b5c" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="soft">
+        <feGaussianBlur stdDeviation="9"/>
+      </filter>
+      <filter id="shadow" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="5"/>
+      </filter>
+    </defs>
+
+    <ellipse cx="250" cy="300" rx="245" ry="285" fill="url(#backGlow)"/>
+    <ellipse cx="250" cy="300" rx="220" ry="270" fill="none" stroke="#b74b68" stroke-opacity=".18"/>
+    <path d="M20 640 Q35 510 110 470 Q165 438 205 435 L295 435 Q365 445 405 485 Q470 535 480 640Z"
+          fill="#120e16" stroke="#774052" stroke-width="2"/>
+
+    <!-- Long hair behind shoulders -->
+    <g class="hair-sway">
+      <path d="M112 188 Q53 245 65 395 Q67 530 23 633 Q106 602 128 505 Q147 416 139 322Z"
+            fill="url(#hairShade)" stroke="#a69bb3" stroke-width="2"/>
+      <path d="M387 175 Q450 250 428 408 Q420 520 481 625 Q389 599 371 498 Q354 386 365 285Z"
+            fill="url(#hairShade)" stroke="#aaa0b7" stroke-width="2"/>
+      <path d="M105 245 Q77 385 77 533 Q99 477 113 363Z" fill="#fff" opacity=".55"/>
+      <path d="M396 245 Q424 380 438 540 Q407 467 391 359Z" fill="#fff" opacity=".45"/>
+      <path d="M93 280 Q112 420 63 580 M117 265 Q137 410 99 540 M400 265 Q377 420 421 580 M379 280 Q361 425 398 552"
+            fill="none" stroke="#fff" stroke-opacity=".65" stroke-width="3"/>
+    </g>
+
+    <!-- Neck, shoulders and outfit -->
+    <g class="breath">
+      <path d="M192 388 L190 462 Q250 507 310 462 L307 383Z" fill="url(#skinBase)"/>
+      <path d="M115 477 Q161 440 193 439 Q250 490 307 439 Q359 444 397 480 L440 650 L60 650Z"
+            fill="url(#coat)" stroke="#774052" stroke-width="2"/>
+      <path d="M190 437 L250 515 L309 437 L288 423 L250 456 L211 423Z"
+            fill="#f0e7ec" stroke="#c9a777" stroke-width="2"/>
+      <path d="M211 456 L250 515 L288 456" fill="none" stroke="url(#gold)" stroke-width="3"/>
+      <path d="M124 500 Q170 480 193 478 L173 650 L65 650Z" fill="#21131e"/>
+      <path d="M376 500 Q330 480 307 478 L327 650 L435 650Z" fill="#21131e"/>
+      <path d="M145 492 L171 650 M355 492 L329 650" stroke="#a83e59" stroke-width="4"/>
+      <path d="M178 535 L250 570 L322 535" fill="none" stroke="url(#gold)" stroke-width="2" opacity=".8"/>
+      <circle cx="250" cy="552" r="8" fill="url(#gold)"/>
+    </g>
+
+    <!-- Hair cap and outer silhouette -->
+    <path d="M102 284 Q67 166 112 90 Q151 17 250 24 Q360 19 398 105 Q435 190 394 302
+             Q383 371 405 475 Q360 431 348 356 L337 224 Q315 151 283 122
+             Q253 160 213 169 Q171 182 143 151 Q118 210 133 340 Q128 423 91 484
+             Q110 365 102 284Z"
+          fill="url(#hairBase)" stroke="#b8afc3" stroke-width="2.5"/>
+
+    <!-- Face and ears -->
+    <g class="head">
+      <path d="M143 173 Q159 117 250 111 Q344 117 358 178
+               L343 302 Q328 383 250 409 Q171 383 156 302Z"
+            fill="url(#skinBase)" stroke="#c48d91" stroke-width="1.6"/>
+      <path d="M143 247 Q121 238 128 280 Q135 307 157 305
+               M357 247 Q379 238 372 280 Q365 307 343 305"
+            fill="url(#skinBase)" stroke="#c48d91" stroke-width="1.5"/>
+      <path d="M151 182 Q190 130 250 132 Q319 130 351 185 L335 300
+               Q323 374 250 395 Q177 374 164 300Z"
+            fill="url(#skinLight)" opacity=".7"/>
+      <ellipse cx="172" cy="303" rx="23" ry="11" fill="#ed9a9c" opacity=".18"/>
+      <ellipse cx="328" cy="303" rx="23" ry="11" fill="#ed9a9c" opacity=".18"/>
+
+      <!-- Brows -->
+      <path d="M169 231 Q197 208 225 227" fill="none" stroke="#9c7781" stroke-width="5" stroke-linecap="round"/>
+      <path d="M275 227 Q304 208 331 231" fill="none" stroke="#9c7781" stroke-width="5" stroke-linecap="round"/>
+
+      <!-- Eyes: shaped, layered scarlet irises -->
+      <g class="eye-blink">
+        <path d="M164 257 Q192 226 230 257 Q202 291 164 257Z" fill="#fff5f0" stroke="#5d3445" stroke-width="2"/>
+        <path d="M270 257 Q308 226 336 257 Q298 291 270 257Z" fill="#fff5f0" stroke="#5d3445" stroke-width="2"/>
+        <path d="M164 257 Q194 220 230 257" fill="none" stroke="#39202e" stroke-width="5" stroke-linecap="round"/>
+        <path d="M270 257 Q306 220 336 257" fill="none" stroke="#39202e" stroke-width="5" stroke-linecap="round"/>
+        <ellipse cx="198" cy="258" rx="14" ry="19" fill="url(#iris)"/>
+        <ellipse cx="302" cy="258" rx="14" ry="19" fill="url(#iris)"/>
+        <ellipse cx="198" cy="260" rx="5" ry="12" fill="#421126"/>
+        <ellipse cx="302" cy="260" rx="5" ry="12" fill="#421126"/>
+        <circle cx="193" cy="249" r="5" fill="#fff"/>
+        <circle cx="297" cy="249" r="5" fill="#fff"/>
+        <circle cx="204" cy="268" r="2.5" fill="#ffc2c3"/>
+        <circle cx="308" cy="268" r="2.5" fill="#ffc2c3"/>
+        <path d="M169 253 L158 244 M178 239 L173 229 M219 239 L225 230
+                 M331 253 L342 244 M322 239 L327 229 M281 239 L275 230"
+              stroke="#39202e" stroke-width="2.5" stroke-linecap="round"/>
+      </g>
+
+      <!-- Nose, lips and subtle face definition -->
+      <path d="M250 262 Q240 291 247 299 Q251 303 259 298"
+            fill="none" stroke="#c38a87" stroke-width="2" stroke-linecap="round"/>
+      <path d="M231 342 Q250 334 269 342 Q250 359 231 342Z" fill="#b75b6c" opacity=".8"/>
+      <path class="mouth" d="M232 342 Q250 353 268 342"
+            fill="none" stroke="#8f3d54" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M237 339 Q250 335 263 339" fill="none" stroke="#ffe1dc" stroke-width="2"/>
+      <path d="M169 300 Q187 309 201 300 M299 300 Q313 309 331 300"
+            fill="none" stroke="#e58f96" stroke-width="3" opacity=".25"/>
+      <path d="M184 374 Q250 394 316 374" fill="none" stroke="#e9b4ad" stroke-width="2" opacity=".35"/>
+    </g>
+
+    <!-- Forehead fringe: many individually layered locks -->
+    <g class="hair-sway">
+      <path d="M112 204 Q102 99 187 64 Q229 44 270 65 Q224 77 210 139
+               Q195 180 184 221 Q166 186 160 131 Q139 166 112 204Z"
+            fill="url(#hairBase)" stroke="#c1b8ca" stroke-width="1.5"/>
+      <path d="M169 68 Q220 44 263 75 Q238 112 236 170 Q222 206 207 229
+               Q205 159 169 68Z" fill="#fff" stroke="#c8bfce" stroke-width="1.5"/>
+      <path d="M250 55 Q316 48 349 108 Q366 140 350 210
+               Q333 177 315 158 Q297 130 286 94 Q273 131 255 180
+               Q260 105 250 55Z" fill="url(#hairBase)" stroke="#bcb2c4" stroke-width="1.5"/>
+      <path d="M300 74 Q370 91 381 169 Q365 150 348 145
+               Q335 114 300 74Z" fill="#fdfaff"/>
+      <path d="M128 121 Q158 79 189 74 Q155 121 152 176
+               M151 95 Q179 73 206 68 Q178 123 177 178
+               M210 67 Q231 65 250 77 Q226 129 222 188
+               M270 69 Q300 75 319 103 Q290 124 278 183
+               M309 90 Q340 110 348 151 Q323 133 304 124"
+            fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="4" stroke-linecap="round"/>
+      <path d="M115 178 Q135 146 148 119 M181 78 Q198 124 193 191
+               M239 78 Q249 130 239 202 M289 83 Q303 131 294 186
+               M334 119 Q353 172 343 218"
+            fill="none" stroke="#b9afc4" stroke-width="2" opacity=".75"/>
+    </g>
+
+    <!-- Side locks and flowing strands -->
+    <g class="hair-sway-left">
+      <path d="M132 174 Q110 241 133 318 Q143 363 117 444
+               Q161 391 160 331 Q155 249 170 194Z"
+            fill="url(#hairBase)" stroke="#b9afc4" stroke-width="1.5"/>
+      <path d="M145 194 Q130 270 147 330 Q152 365 135 410
+               M122 225 Q115 302 134 360"
+            fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+    </g>
+    <g class="hair-sway">
+      <path d="M352 171 Q382 240 359 318 Q349 367 384 444
+               Q340 395 337 329 Q339 250 324 194Z"
+            fill="url(#hairBase)" stroke="#b9afc4" stroke-width="1.5"/>
+      <path d="M346 198 Q369 278 351 346 Q347 377 367 413
+               M370 224 Q385 301 363 361"
+            fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+    </g>
+
+    <!-- Small aristocratic hair ornament -->
+    <path d="M345 115 L359 98 L373 115 L359 132Z" fill="#6d1d36" stroke="url(#gold)" stroke-width="2"/>
+    <circle cx="359" cy="115" r="4" fill="#e4b4a0"/>
+  </svg>
+  </div>
+
+  <div class="character-caption">
+    <h2>Testarossa</h2>
+    <p>Elegant · Proud · Commanding · Mischievous</p>
+  </div>
+  <div class="presence">
+    <strong id="expression-label">Calm and composed</strong>
+    <div id="presence-note">Her first code-rendered character preview</div>
+  </div>
+</section>
+
+<section class="panel chat-panel">
+  <div class="chat-head">
+    <div>
+      <h2>Conversation</h2>
+      <div class="connection"><span class="dot" id="dot"></span><span id="status">Connecting...</span></div>
+    </div>
+    <div class="modes">
+      <button class="mode active" id="companion" type="button">Companion</button>
+      <button class="mode" id="professional" type="button">Professional</button>
+    </div>
+  </div>
+  
+  <details id="computer-awareness" aria-label="Computer awareness">
+    <summary class="computer-summary">
+      <span class="computer-summary-title">COMPUTER AWARENESS</span>
+      <span class="computer-summary-hint">Workstation · Blender · Read only</span>
+      <span class="computer-chevron" aria-hidden="true">⌄</span>
+    </summary>
+    <div class="computer-panel-content">
+    <div class="computer-head">
+      <h3>COMPUTER AWARENESS · READ ONLY</h3>
+      <button id="computer-refresh" type="button">Refresh computer + scene</button>
+    </div>
+    <div class="computer-grid">
+      <div class="computer-item">
+        <span class="computer-label">Windows workstation</span>
+        <span class="computer-value" id="workstation-value">Not checked</span>
+      </div>
+      <div class="computer-item">
+        <span class="computer-label">Blender</span>
+        <span class="computer-value" id="blender-value">Not checked</span>
+      </div>
+      <div class="computer-item">
+        <span class="computer-label">Active Blender scene</span>
+        <span class="computer-value" id="blender-scene-value">Not inspected</span>
+      </div>
+    </div>
+    <div class="computer-item" style="margin-top:8px">
+      <span class="computer-label">Scene inspection · Read only</span>
+      <pre class="computer-value" id="blender-scene-details" style="white-space:pre-wrap;margin:6px 0 0;font:inherit">No scene snapshot yet.</pre>
+    </div>
+    <div class="computer-item" style="margin-top:8px">
+      <span class="computer-label">Blender project overview · Read only</span>
+      <pre class="computer-value" id="blender-project-details" style="white-space:pre-wrap;margin:6px 0 0;font:inherit">No project snapshot yet.</pre>
+    </div>
+    <span id="computer-updated">No computer status request made yet.</span>
+  
+    </div>
+  </details>
+
+  <main id="chat">
+    <div class="message baby">Greetings, Master. I am Testarossa.
+
+An elegant presence, a sharp mind, and a little mischief when the moment permits. I am here. 💗</div>
+  </main>
+  <div class="composer">
+    <form id="form">
+      <textarea id="input" placeholder="Speak with Testarossa..." maxlength="4000" required></textarea>
+      <button class="send" id="send" type="submit">Send</button>
+    </form>
+    <div class="hint">Local Qwen connection · Early development · Human-supervised</div>
+  </div>
+</section>
+
+<aside class="panel details">
+  <div>
+    <div class="eyebrow">Character profile</div>
+    <h3 style="margin-top:8px">Her nature</h3>
+    <div class="detail-card">
+      <p>An elegant, proud and commanding demoness, with a warm, affectionate and delightfully mischievous side reserved for those she trusts.</p>
+    </div>
+  </div>
+  <div>
+    <h3>Personality foundation</h3>
+    <div class="trait"><span>Elegance</span><div class="track"><i style="--w:96%"></i></div></div>
+    <div class="trait"><span>Confidence</span><div class="track"><i style="--w:94%"></i></div></div>
+    <div class="trait"><span>Intelligence</span><div class="track"><i style="--w:95%"></i></div></div>
+    <div class="trait"><span>Playfulness</span><div class="track"><i style="--w:78%"></i></div></div>
+    <div class="trait"><span>Affection</span><div class="track"><i style="--w:82%"></i></div></div>
+  </div>
+  <div>
+    <h3>Visual identity</h3>
+    <span class="tag">Snow-white hair</span>
+    <span class="tag">Scarlet eyes</span>
+    <span class="tag">Warm complexion</span>
+    <span class="tag">Refined features</span>
+    <span class="tag">Aristocratic style</span>
+  </div>
+  <div>
+    <h3>Development status</h3>
+    <div class="detail-card">
+      <p>Code-rendered portrait: active</p>
+      <p>Chat connection: existing</p>
+      <p>Expression reactions: prototype</p>
+      <p>Full 3D model: planned</p>
+      <p>Persistent personality: planned</p>
+    </div>
+  </div>
+  <section class="presence-card" aria-label="Testarossa current presence">
+    <div class="presence-card-heading">
+      <span class="presence-orb"></span>
+      <div>
+        <div class="eyebrow">CURRENT PRESENCE</div>
+        <h3>At your service, Master</h3>
+      </div>
+    </div>
+    <p class="presence-intro">My current capabilities and the boundaries that keep your system under your control.</p>
+    <div class="presence-capability">
+      <span class="presence-symbol">✦</span>
+      <div><strong>Conversation &amp; planning</strong><span>Available</span></div>
+    </div>
+    <div class="presence-capability">
+      <span class="presence-symbol">⌘</span>
+      <div><strong>Computer awareness</strong><span>Read-only inspection</span></div>
+    </div>
+    <div class="presence-capability">
+      <span class="presence-symbol">◇</span>
+      <div><strong>Blender awareness</strong><span>Scene and project inspection</span></div>
+    </div>
+    <div class="presence-capability">
+      <span class="presence-symbol">⚿</span>
+      <div><strong>Changes to files or Blender</strong><span>Your approval required</span></div>
+    </div>
+    <div class="presence-card-foot">Your system. Your permissions. Your decisions.</div>
+  </section>
+  <div class="footer-note">
+    This portrait is drawn using SVG paths, gradients and CSS animation. It is not a generated image or a finished 3D model. Mode buttons currently change the visual profile only.
+  </div>
+</aside>
+</div>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const statusText = document.getElementById("status");
+const dot = document.getElementById("dot");
+const portrait = document.getElementById("portrait");
+const expressionLabel = document.getElementById("expression-label");
+const presenceNote = document.getElementById("presence-note");
+const history = [];
+let mode = "companion";
+
+function setExpression(state,label,note) {
+  portrait.dataset.expression = state;
+  expressionLabel.textContent = label;
+  presenceNote.textContent = note;
+}
+function bubble(text,who) {
+  const el = document.createElement("div");
+  el.className = "message " + who;
+
+  const content = document.createElement("span");
+  content.className = "message-content";
+  content.setAttribute("aria-label", text);
+
+  const parts = text.split(/(\s+)/);
+  let wordIndex = 0;
+
+  for (const part of parts) {
+    if (!part) continue;
+
+    if (/^\s+$/.test(part)) {
+      content.appendChild(document.createTextNode(part));
+      continue;
+    }
+
+    const word = document.createElement("span");
+    word.className = "animated-word";
+    word.textContent = part;
+    word.setAttribute("aria-hidden", "true");
+    word.style.setProperty(
+      "--word-delay",
+      Math.min(wordIndex * 24, 900) + "ms"
+    );
+    content.appendChild(word);
+    wordIndex++;
+  }
+
+  el.appendChild(content);
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showBlenderProposal(p) {
+  const card = document.createElement("div");
+  card.style.cssText = "margin:12px 0;padding:14px;border:1px solid #b99a68;border-radius:12px;background:#171923;color:#eee";
+  const heading = document.createElement("div");
+  heading.textContent = "Testarossa Blender execution approval";
+  heading.style.cssText = "font-weight:700;color:#e8c98c;margin-bottom:8px";
+  const target = document.createElement("div");
+  target.textContent = "New isolated project: " + p.project_slug;
+  target.style.cssText = "margin:8px 0;color:#e8c98c;overflow-wrap:anywhere";
+  const digest = document.createElement("div");
+  digest.textContent = "Immutable plan SHA-256: " + p.plan_digest;
+  digest.style.cssText = "font-size:12px;overflow-wrap:anywhere;margin:8px 0";
+  const details = document.createElement("pre");
+  details.textContent = JSON.stringify({
+    step_count: p.step_count,
+    execution_model: p.execution_model,
+    operations: p.operations
+  }, null, 2);
+  details.style.cssText = "white-space:pre-wrap;overflow:auto;max-height:300px;max-width:100%;padding:10px;background:#10131b;border-radius:8px;font-size:12px";
+  const warning = document.createElement("div");
+  warning.textContent = "Approval starts a separate Blender 5.3 factory-startup process and creates a new project at this dedicated path. If the target project already exists, the bridge rejects the request; it never overwrites an existing .blend file. It does not edit the currently open Blender scene. This approval expires in five minutes and can be used once.";
+  warning.style.cssText = "font-size:12px;line-height:1.5;margin:10px 0;color:#f0d8a8";
+  const actions = document.createElement("div");
+  actions.style.cssText = "display:flex;gap:10px;margin-top:10px";
+  const approve = document.createElement("button");
+  approve.type = "button";
+  approve.textContent = "Approve Blender build";
+  const reject = document.createElement("button");
+  reject.type = "button";
+  reject.textContent = "Reject";
+  const status = document.createElement("div");
+  status.style.cssText = "margin-top:8px;font-size:12px;overflow-wrap:anywhere";
+
+  async function act(endpoint, label) {
+    approve.disabled = true;
+    reject.disabled = true;
+    status.textContent = "Processing one-time approval...";
+    try {
+      const r = await fetch(endpoint, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({proposal_id:p.proposal_id})
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Request rejected");
+      if (endpoint === "/api/blender/approve") {
+        const result = d.result || {};
+        const execution = result.execution || {};
+        status.textContent = "Execution verified. Project: " +
+          (result.project_path || "path unavailable") +
+          " · Objects: " + execution.object_count +
+          " · Collections: " + execution.collection_count +
+          " · Materials: " + execution.material_count +
+          " · SHA-256: " + (result.plan_digest || p.plan_digest);
+      } else {
+        status.textContent = label + ". The one-time proposal was consumed.";
+      }
+    } catch(e) {
+      status.textContent = e.message +
+        ". The one-time authorization cannot be replayed; inspect the project and bridge log before preparing another plan.";
+    }
+  }
+  approve.addEventListener("click",()=>act("/api/blender/approve","Approved"));
+  reject.addEventListener("click",()=>act("/api/blender/reject","Rejected"));
+  actions.append(approve,reject);
+  card.append(heading,target,digest,details,warning,actions,status);
+  chat.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showProposal(p) {
+  if (p && p.type === "blender") {
+    showBlenderProposal(p);
+    return;
+  }
+  const isDirectory = p.type === "directory";
+  const card = document.createElement("div");
+  card.style.cssText = "margin:12px 0;padding:14px;border:1px solid #b99a68;border-radius:12px;background:#171923;color:#eee";
+  const heading = document.createElement("div");
+  heading.textContent = isDirectory ? "Directory creation approval" : "Proposed file change";
+  heading.style.cssText = "font-weight:700;color:#e8c98c;margin-bottom:8px";
+  const path = document.createElement("div");
+  path.style.cssText = "margin:8px 0;color:#e8c98c;overflow-wrap:anywhere";
+  path.textContent = p.path;
+  card.append(heading, path);
+
+  if (!isDirectory) {
+    const hash = document.createElement("div");
+    hash.style.cssText = "font-size:12px;opacity:.8;margin-bottom:8px";
+    hash.textContent = "New SHA-256: " + p.content_sha256 +
+      (p.expected_sha256 ? " · Existing SHA-256: " + p.expected_sha256 : " · New file");
+    const preview = document.createElement("pre");
+    preview.textContent = p.content;
+    preview.style.cssText = "white-space:pre-wrap;overflow:auto;max-height:260px;max-width:100%;padding:10px;background:#10131b;border-radius:8px;font-size:12px";
+    card.append(hash, preview);
+  } else {
+    const description = document.createElement("div");
+    description.textContent = "Baby is requesting permission to create this directory. Nothing has been created yet.";
+    description.style.cssText = "font-size:13px;margin:8px 0";
+    card.append(description);
+  }
+
+  const actions = document.createElement("div");
+  actions.style.cssText = "display:flex;gap:10px;margin-top:10px";
+  const approve = document.createElement("button");
+  approve.type = "button";
+  approve.textContent = isDirectory ? "Approve directory" : "Approve change";
+  const reject = document.createElement("button");
+  reject.type = "button";
+  reject.textContent = "Reject";
+  const status = document.createElement("div");
+  status.style.cssText = "margin-top:8px;font-size:12px";
+
+  async function act(endpoint, label) {
+    approve.disabled = true;
+    reject.disabled = true;
+    status.textContent = "Processing...";
+    try {
+      const r = await fetch(endpoint, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({proposal_id:p.proposal_id})
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Request rejected");
+      if (endpoint === "/api/approve") {
+        const result = d.result && d.result.result ? d.result.result : {};
+        status.textContent = isDirectory
+          ? "Directory approved and created: " + (result.path || p.path)
+          : "Approved and written. SHA-256: " + (result.sha256 || "verified") +
+            (result.backup ? " · Backup: " + result.backup : "");
+      } else {
+        status.textContent = label;
+      }
+    } catch(e) {
+      status.textContent = e.message;
+      approve.disabled = false;
+      reject.disabled = false;
+    }
+  }
+  approve.addEventListener("click",()=>act("/api/approve","Approved"));
+  reject.addEventListener("click",()=>act("/api/reject","Rejected"));
+  actions.append(approve,reject);
+  card.append(actions,status);
+  chat.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function setMode(next) {
+  mode = next;
+  document.getElementById("companion").classList.toggle("active",mode==="companion");
+  document.getElementById("professional").classList.toggle("active",mode==="professional");
+  presenceNote.textContent = mode==="companion"
+    ? "Companion visual profile selected"
+    : "Professional visual profile selected";
+}
+document.getElementById("companion").addEventListener("click",()=>setMode("companion"));
+document.getElementById("professional").addEventListener("click",()=>setMode("professional"));
+
+
+async function refreshComputerStatus() {
+  const button = document.getElementById("computer-refresh");
+  const workstation = document.getElementById("workstation-value");
+  const blender = document.getElementById("blender-value");
+  const sceneValue = document.getElementById("blender-scene-value");
+  const sceneDetails = document.getElementById("blender-scene-details");
+  const projectDetails = document.getElementById("blender-project-details");
+  const updated = document.getElementById("computer-updated");
+  button.disabled = true;
+  button.textContent = "Inspecting...";
+  updated.textContent = "Contacting authenticated Windows observer...";
+  try {
+    const [wr, br] = await Promise.all([
+      fetch("/api/computer/status?operation=workstation", {cache:"no-store"}),
+      fetch("/api/computer/status?operation=blender_status", {cache:"no-store"})
+    ]);
+    const [wd, bd] = await Promise.all([wr.json(), br.json()]);
+    if (!wr.ok || !wd.ok) throw new Error("Workstation status unavailable");
+    if (!br.ok || !bd.ok) throw new Error("Blender status unavailable");
+
+    const w = wd.result;
+    workstation.textContent =
+      w.hostname + " · " + w.os + " · " + w.architecture +
+      " · Python " + w.python;
+
+    const b = bd.result;
+    blender.textContent = b.installed
+      ? (b.version || "Installed; version unavailable") +
+        " · " + (b.running ? "Running" : "Not running")
+      : "Not installed or executable unavailable";
+    if (b.version_error) blender.textContent += " · " + b.version_error;
+
+    try {
+      const sr = await fetch(
+        "/api/computer/status?operation=blender_scene_snapshot",
+        {cache:"no-store"}
+      );
+      const sd = await sr.json();
+      if (!sr.ok || !sd.ok) throw new Error("Scene inspector unavailable");
+      const s = sd.result;
+      const sc = s.scene;
+      const sum = s.summary;
+      sceneValue.textContent =
+        sc.name + " · " + s.blender_version + " · " +
+        sum.object_count + " objects";
+      const lines = [
+        "Scene: " + sc.name,
+        "Frame: " + sc.frame_current + " (range " +
+          sc.frame_start + "–" + sc.frame_end + ")",
+        "Render: " + sc.render_engine + " · " +
+          sc.resolution_x + " × " + sc.resolution_y +
+          " (" + sc.resolution_percentage + "%)",
+        "Active object: " + (sc.active_object || "None"),
+        "Camera: " + (sc.camera || "None"),
+        "Objects: " + sum.object_count +
+          " · Meshes: " + sum.mesh_count +
+          " · Armatures: " + sum.armature_count +
+          " · Cameras: " + sum.camera_count +
+          " · Lights: " + sum.light_count,
+        "",
+        "Object list:"
+      ];
+      s.objects.slice(0, 40).forEach(obj => {
+        let line = "• " + obj.name + " [" + obj.type + "]";
+        if (obj.geometry) {
+          line += " · " + obj.geometry.vertices + " verts / " +
+            obj.geometry.edges + " edges / " +
+            obj.geometry.polygons + " faces";
+        }
+        if (obj.armature) {
+          line += " · " + obj.armature.bone_count + " bones";
+        }
+        if (obj.modifiers.length) {
+          line += " · " + obj.modifiers.length + " modifiers";
+        }
+        lines.push(line);
+      });
+      if (s.objects.length > 40 || sum.objects_truncated) {
+        lines.push("… additional objects omitted from this display.");
+      }
+      sceneDetails.textContent = lines.join("\n");
+    } catch (sceneError) {
+      sceneValue.textContent = "Scene unavailable";
+      sceneDetails.textContent =
+        "Could not inspect the active Blender scene. " +
+        "Ensure Blender is open and the JARVIS scene bridge is enabled. " +
+        "(" + sceneError.message + ")";
+    }
+    try {
+      const pr = await fetch(
+        "/api/computer/status?operation=blender_project_snapshot",
+        {cache:"no-store"}
+      );
+      const pd = await pr.json();
+      if (!pr.ok || !pd.ok) throw new Error("Project inspector unavailable");
+
+      const p = pd.result;
+      const meta = p.project;
+      const summary = p.summary;
+      const lines = [
+        "Project: " + (meta.filename || "Untitled / unsaved"),
+        "File: " + (meta.filepath || "Not saved to disk"),
+        "Saved: " + (meta.is_saved ? "Yes" : "No") +
+          " · Modified: " + (meta.is_dirty ? "Yes" : "No"),
+        "Blender: " + p.blender_version,
+        "",
+        "Inventory:",
+        "Scenes: " + summary.scene_count +
+          " · Collections: " + summary.collection_count,
+        "Materials: " + summary.material_count +
+          " · Actions: " + summary.action_count,
+        "Objects: " + summary.object_count +
+          " · Meshes: " + summary.mesh_count +
+          " · Armatures: " + summary.armature_count +
+          " · Cameras: " + summary.camera_count +
+          " · Lights: " + summary.light_count,
+        "",
+        "Scenes:"
+      ];
+
+      (p.scenes || []).slice(0, 30).forEach(scene => {
+        lines.push("• " + scene.name +
+          " · " + scene.object_count + " objects" +
+          " · frames " + scene.frame_start + "–" + scene.frame_end +
+          " · " + scene.render_engine);
+        (scene.objects || []).slice(0, 12).forEach(obj => {
+          let detail = "   - " + obj.name + " [" + obj.type + "]";
+          if (obj.armature) detail += " · " + obj.armature.bone_count + " bones";
+          if (obj.modifiers.length) detail += " · " + obj.modifiers.length + " modifiers";
+          if (obj.constraints.length) detail += " · " + obj.constraints.length + " constraints";
+          lines.push(detail);
+        });
+        if (scene.objects.length > 12 || scene.objects_truncated) {
+          lines.push("   … more objects in this scene");
+        }
+      });
+
+      lines.push("", "Collections:");
+      (p.collections || []).slice(0, 80).forEach(item => {
+        lines.push("• " + item.name +
+          (item.parent ? " · parent: " + item.parent : " · root") +
+          " · " + item.objects.length + " listed objects");
+      });
+      if (p.collections_truncated || p.collections.length > 80) {
+        lines.push("… additional collections omitted.");
+      }
+
+      lines.push("", "Materials:");
+      (p.materials || []).slice(0, 80).forEach(item => {
+        lines.push("• " + item.name + " · " + item.users +
+          " users · nodes " + (item.use_nodes ? "enabled" : "disabled"));
+      });
+      if (p.materials_truncated || p.materials.length > 80) {
+        lines.push("… additional materials omitted.");
+      }
+
+      lines.push("", "Actions:");
+      (p.actions || []).slice(0, 80).forEach(item => {
+        lines.push("• " + item.name + " · " + item.users + " users" +
+          " · " + item.layers + " layers · " + item.slots + " slots" +
+          " · keyframes " +
+          (item.keyframes_available ? item.keyframes : "unavailable"));
+      });
+      if (p.actions_truncated || p.actions.length > 80) {
+        lines.push("… additional actions omitted.");
+      }
+
+      lines.push("", "Project object inventory:");
+      (p.objects || []).slice(0, 60).forEach(obj => {
+        let detail = "• " + obj.name + " [" + obj.type + "]";
+        if (obj.scenes.length) detail += " · scenes: " + obj.scenes.join(", ");
+        if (obj.modifiers.length) detail += " · " + obj.modifiers.length + " modifiers";
+        if (obj.constraints.length) detail += " · " + obj.constraints.length + " constraints";
+        if (obj.materials.length) detail += " · materials: " + obj.materials.join(", ");
+        lines.push(detail);
+      });
+      if (p.objects_truncated || p.objects.length > 60) {
+        lines.push("… additional project objects omitted from this display.");
+      }
+      projectDetails.textContent = lines.join("\n");
+    } catch (projectError) {
+      projectDetails.textContent =
+        "Could not inspect the Blender project. Ensure Blender and the " +
+        "JARVIS scene bridge are running. (" + projectError.message + ")";
+    }
+
+    updated.textContent = "Status refreshed: " +
+      new Date().toLocaleString() +
+      ". Blender scene and project inspection are read-only.";
+  } catch (error) {
+    updated.textContent = error.message +
+      ". Check that the Windows observer is running and reachable.";
+  } finally {
+    button.disabled = false;
+    button.textContent = "Refresh computer + scene";
+  }
+}
+document.getElementById("computer-refresh").addEventListener(
+  "click", refreshComputerStatus
+);
+
+async function checkStatus() {
+  try {
+    const r = await fetch("/api/status");
+    if (!r.ok) throw new Error();
+    const s = await r.json();
+    statusText.textContent = s.model + " · Online";
+    dot.style.background = "#70d69a";
+  } catch {
+    statusText.textContent = "Ollama connection unavailable";
+    dot.style.background = "#d76b6b";
+  }
+}
+
+document.getElementById("form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const message = input.value.trim();
+  if (!message || send.disabled) return;
+  bubble(message,"user");
+  history.push({role:"user",content:message});
+  input.value = "";
+  send.disabled = true;
+  send.textContent = "...";
+  statusText.textContent = "Thinking...";
+  setExpression("thinking","Considering your words","Conversation in progress");
+  try {
+    const r = await fetch("/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:history.slice(-10)})
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "Request failed");
+    bubble(data.response,"baby");
+    history.push({role:"assistant",content:data.response});
+    (data.proposals || []).forEach(showProposal);
+    setExpression("happy","A response has arrived","Returning to a composed expression");
+    window.setTimeout(()=>setExpression("idle","Calm and composed","Present in her first visual preview"),1800);
+  } catch(err) {
+    bubble("I couldn't respond: "+err.message,"baby");
+    history.pop();
+    setExpression("curious","Awaiting connection","The conversation connection needs attention");
+  } finally {
+    send.disabled = false;
+    send.textContent = "Send";
+    checkStatus();
+    input.focus();
+  }
+});
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey) {
+    e.preventDefault();
+    document.getElementById("form").requestSubmit();
+  }
+});
+checkStatus();
+</script>
+</body>
+</html>
